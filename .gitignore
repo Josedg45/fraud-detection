@@ -28,7 +28,6 @@ data/external/*
 # ML / Experiment tracking
 # =========================
 mlruns/
-models/
 artifacts/
 
 # =========================

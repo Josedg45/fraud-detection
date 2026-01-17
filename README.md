@@ -6,26 +6,15 @@ End-to-end machine learning system for detecting fraudulent transactions using a
 
 ## Architecture Overview
 
-Raw Data (CSV / Kaggle)
-        |
-        v
-Data Ingestion & Validation (Pandera)
-        |
-        v
-Exploratory Data Analysis (EDA)
-        |
-        v
-Feature Engineering
-        |
-        v
-Model Training & Tracking (MLflow)
-        |
-        v
-Evaluation & Monitoring (Evidently AI)
-        |
-        v
-API / Deployment (FastAPI)
-
+```mermaid
+graph TD
+    A[Raw Data: CSV / Kaggle] --> B[Data Ingestion & Validation: Pandera]
+    B --> C[Exploratory Data Analysis: EDA]
+    C --> D[Feature Engineering]
+    D --> E[Model Training & Tracking: MLflow]
+    E --> F[Evaluation & Monitoring: Evidently AI]
+    F --> G[API / Deployment: FastAPI]
+```
 ---
 
 ## Key Features

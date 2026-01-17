@@ -34,4 +34,20 @@ Evaluation & Monitoring (planned)
         ↓
 API / Streaming (planned)
 
+--
 
+## Key Features
+
+- Data Validation: Schema enforcement with Pandera to catch data issues early.
+- Experiment Tracking: Full lineage of parameters, metrics (ROC-AUC, PR-AUC), and artifacts via MLflow.
+- Model Registry: Centralized management of model versions in Staging and Production.
+- Drift Monitoring: Automated generation of HTML reports for Data and Prediction Drift using Evidently.
+- Deployment: Production-ready API for fraud scoring.
+
+-- 
+
+## Results
+
+- Best model ROC-AUC: 0.7607
+- PR-AUC: 0.0478
+- Model currently hosted in **MLflow Registry** under fraud_lightgbm.

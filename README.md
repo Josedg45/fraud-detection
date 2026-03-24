@@ -51,7 +51,7 @@ python src/models/train_lgbm.py
 python src/monitoring/prediction_drift.py
 
 # Start Prediction API
-uvicorn src.app:app --reload
+uvicorn src.serving.app:app --reload
 
 ---
 

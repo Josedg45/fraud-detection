@@ -1,6 +1,8 @@
 # src/ingestion/schema.py
 import pandera.pandas as pa
-from pandera import Column, DataFrameSchema, Check
+from pandera import Check, Column, DataFrameSchema
+
+from src.config import PCA_FEATURES
 
 transaction_schema = DataFrameSchema(
     {
@@ -12,7 +14,8 @@ transaction_schema = DataFrameSchema(
         "country": Column(str),
         "device_id": Column(str),
         "payment_method": Column(str),
-        "label": Column(int, Check.isin([0, 1]))
+        **{name: Column(float, nullable=False) for name in PCA_FEATURES},
+        "label": Column(int, Check.isin([0, 1])),
     },
-    strict=True
+    strict=True,
 )

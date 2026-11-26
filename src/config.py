@@ -8,15 +8,19 @@ MODEL_NAME = "fraud_lightgbm"
 MODEL_ALIAS = "staging"
 MODEL_URI = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
 
-# Column order the model is trained on (numeric columns of data/processed/features.csv).
-# LightGBM predicts by position, so every caller must send columns in this order.
-FEATURES = [
-    "transaction_id",
-    "user_id",
-    "amount",
-    "device_id",
-    "hour",
-    "day_of_week",
-    "txn_count_1h",
-    "txn_sum_24h",
-]
+# PCA components released with the Kaggle dataset. They carry most of the signal.
+PCA_FEATURES = [f"V{i}" for i in range(1, 29)]
+
+# Columns the model is trained on, in order. LightGBM predicts by position,
+# so every caller must send columns in this order.
+#
+# The user/device/merchant columns are simulated in load_kaggle.py (the Kaggle
+# data has no such fields), so IDs and per-user aggregates are NOT model features:
+# they would only add noise. They stay in the pipeline to show the feature design
+# that would apply to real transaction data.
+FEATURES = PCA_FEATURES + ["amount", "hour"]
+
+# Chronological split: train on the oldest data, early-stop on the next slice,
+# report metrics on the most recent slice (closer to how fraud models are deployed).
+VALID_FRACTION = 0.15
+TEST_FRACTION = 0.15

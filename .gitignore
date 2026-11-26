@@ -42,3 +42,10 @@ artifacts/
 Thumbs.db
 .vscode/
 .idea/
+
+# MLflow local tracking store and generated reports
+mlflow.db
+mlartifacts/
+reports/*.html
+monitoring/*.html
+.pytest_cache/

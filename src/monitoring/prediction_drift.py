@@ -1,38 +1,33 @@
 import pandas as pd
+import mlflow
 import mlflow.pyfunc
 from evidently.report import Report
 from evidently.metrics import DatasetDriftMetric
 import os
 
+from src.config import FEATURES, MODEL_URI, TRACKING_URI
+
 REFERENCE_PATH = "data/processed/features.csv"
 NEW_PATH = "data/processed/features.csv"
 OUTPUT_HTML = "monitoring/prediction_drift.html"
 
-MODEL_NAME = "fraud_lightgbm"
-ALIAS = "staging"
-
 def run_prediction_drift():
     os.makedirs(os.path.dirname(OUTPUT_HTML), exist_ok=True)
 
-    model_uri = f"models:/{MODEL_NAME}@{ALIAS}"
-    model = mlflow.pyfunc.load_model(model_uri)
+    mlflow.set_tracking_uri(TRACKING_URI)
+    model = mlflow.pyfunc.load_model(MODEL_URI)
 
     reference_df = pd.read_csv(REFERENCE_PATH)
     new_df = pd.read_csv(NEW_PATH)
 
-    all_numeric = reference_df.select_dtypes(include=["number"]).columns.tolist()
-    
-    # Solo quitamos 'label'. Mantendremos 'transaction_id' para llegar a 8.
-    # Si sigue fallando con 9, entonces el que sobra es 'user_id' o 'device_id'.
-    to_exclude = ["label"] 
-    features = [col for col in all_numeric if col not in to_exclude]
+    features = FEATURES
 
-    ref_input = reference_df[features].copy()
-    new_input = new_df[features].copy()
+    ref_input = reference_df[features].astype("float64")
+    new_input = new_df[features].astype("float64")
 
     if len(ref_input) > 5000:
         ref_input = ref_input.sample(5000, random_state=42)
-        new_input = new_df[features].sample(5000, random_state=42)
+        new_input = new_input.sample(5000, random_state=42)
 
     print(f"Features para predicción ({len(features)}): {features}")
     

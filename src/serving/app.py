@@ -5,6 +5,7 @@ import pandas as pd
 import mlflow.pyfunc
 from pydantic import BaseModel, Field
 
+from src.config import FEATURES, MODEL_URI, TRACKING_URI
 from src.serving.decision import fraud_decision
 
 
@@ -24,12 +25,13 @@ app = FastAPI(title="Fraud Detection API")
 
 @lru_cache(maxsize=1)
 def get_model():
-    return mlflow.pyfunc.load_model("models:/fraud_lightgbm@staging")
+    mlflow.set_tracking_uri(TRACKING_URI)
+    return mlflow.pyfunc.load_model(MODEL_URI)
 
 
 @app.post("/predict")
 def predict(payload: PredictRequest):
-    df = pd.DataFrame([payload.model_dump()])
+    df = pd.DataFrame([payload.model_dump()])[FEATURES].astype("float64")
     score = float(get_model().predict(df)[0])
     decision = fraud_decision(score)
 

@@ -1,24 +1,28 @@
-import pandas as pd
+import mlflow
 import mlflow.pyfunc
+import pandas as pd
 
-MODEL_URI = "models:/fraud_lightgbm@staging"
+from src.config import FEATURES, MODEL_URI, TRACKING_URI
+
 
 def run():
+    mlflow.set_tracking_uri(TRACKING_URI)
     model = mlflow.pyfunc.load_model(MODEL_URI)
 
     sample = pd.DataFrame([{
+        "transaction_id": 999,
+        "user_id": 102,
         "amount": 250.0,
+        "device_id": 5,
         "hour": 22,
         "day_of_week": 5,
-        "user_tx_count_24h": 7,
-        "user_avg_amount_24h": 90.5,
-        "user_tx_sum_24h": 1200.0,
-        "num_devices_30d": 2,
-        "velocity_ip_changes": 1
-    }])
+        "txn_count_1h": 7,
+        "txn_sum_24h": 12,
+    }])[FEATURES].astype("float64")
 
     score = model.predict(sample)[0]
     print("Fraud score:", score)
+
 
 if __name__ == "__main__":
     run()

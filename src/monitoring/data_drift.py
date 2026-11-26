@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 from evidently.metrics import DataDriftPreset
 from evidently.report import Report
@@ -16,5 +18,6 @@ new_df = new_df.select_dtypes(include=["number"])
 report = Report(metrics=[DataDriftPreset()])
 report.run(reference_data=reference_df, current_data=new_df)
 
+os.makedirs("reports", exist_ok=True)
 report.save_html("reports/data_drift.html")
 print("✅ Data drift report saved at reports/data_drift.html")

@@ -2,22 +2,25 @@ import pandas as pd
 import lightgbm as lgb
 import mlflow
 import mlflow.lightgbm
+from mlflow import MlflowClient
+from mlflow.models import infer_signature
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score, average_precision_score
+
+from src.config import FEATURES, MODEL_ALIAS, MODEL_NAME, TRACKING_URI
 
 DATA_PATH = "data/processed/features.csv"
 
 def train():
 
-    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_tracking_uri(TRACKING_URI)
     mlflow.set_experiment("fraud-detection")
 
 
     df = pd.read_csv(DATA_PATH)
 
-    X = df.drop(columns="label")
-    X = X.select_dtypes(include=["number"])
+    X = df[FEATURES].astype("float64")
     y = df["label"]
 
     X_train, X_val, y_train, y_val = train_test_split(
@@ -57,10 +60,16 @@ def train():
         mlflow.log_metric("roc_auc", roc)
         mlflow.log_metric("pr_auc", pr)
 
-        mlflow.lightgbm.log_model(
+        info = mlflow.lightgbm.log_model(
             model,
             artifact_path="model",
-            registered_model_name="fraud_lightgbm"
+            registered_model_name=MODEL_NAME,
+            signature=infer_signature(X_val, preds),
+        )
+
+        # Serving and monitoring load models:/fraud_lightgbm@staging
+        MlflowClient().set_registered_model_alias(
+            MODEL_NAME, MODEL_ALIAS, info.registered_model_version
         )
 
         print(f"ROC-AUC: {roc:.4f}")

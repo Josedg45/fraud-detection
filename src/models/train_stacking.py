@@ -10,17 +10,18 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
+from src.config import FEATURES, TRACKING_URI
+
 DATA_PATH = "data/processed/features.csv"
 
 def train():
 
-    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_tracking_uri(TRACKING_URI)
     mlflow.set_experiment("fraud-detection")
 
     df = pd.read_csv(DATA_PATH)
 
-    X = df.drop(columns="label")
-    X = X.select_dtypes(include=["number"])
+    X = df[FEATURES].astype("float64")
     y = df["label"]
 
     X_train, X_val, y_train, y_val = train_test_split(
